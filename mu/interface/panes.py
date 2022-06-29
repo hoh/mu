@@ -27,7 +27,7 @@ import bisect
 import os.path
 import codecs
 
-from PyQt5.QtCore import (
+from PyQt6.QtCore import (
     Qt,
     QProcess,
     QProcessEnvironment,
@@ -36,7 +36,7 @@ from PyQt5.QtCore import (
     QUrl,
 )
 from collections import deque
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QMessageBox,
     QTextEdit,
     QFrame,
@@ -46,7 +46,7 @@ from PyQt5.QtWidgets import (
     QMenu,
     QTreeView,
 )
-from PyQt5.QtGui import (
+from PyQt6.QtGui import (
     QKeySequence,
     QTextCursor,
     QCursor,
@@ -65,7 +65,7 @@ logger = logging.getLogger(__name__)
 
 CHARTS = True
 try:  # pragma: no cover
-    from PyQt5.QtChart import QChart, QLineSeries, QChartView, QValueAxis
+    from PyQt6.QtChart import QChart, QLineSeries, QChartView, QValueAxis
 except ImportError:  # pragma: no cover
     logger.info("Unable to find QChart. Plotter button will not display.")
     QChartView = object
@@ -213,7 +213,7 @@ class MicroPythonREPLPane(QTextEdit):
 
         menu.addAction("Copy", self.copy, copy_keys)
         menu.addAction("Paste", self.paste, paste_keys)
-        menu.exec_(QCursor.pos())
+        menu.exec(QCursor.pos())
 
     def set_theme(self, theme):
         self.set_font_size(self.font_size)
@@ -657,7 +657,7 @@ class MuFileList(QListWidget):
         msg.setText(_("File already exists; overwrite it?"))
         msg.setWindowTitle(_("File already exists"))
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        return msg.exec_() == QMessageBox.Ok
+        return msg.exec() == QMessageBox.Ok
 
 
 class MicroPythonDeviceFileList(MuFileList):
@@ -707,7 +707,7 @@ class MicroPythonDeviceFileList(MuFileList):
             return
         menu = QMenu(self)
         delete_action = menu.addAction(_("Delete (cannot be undone)"))
-        action = menu.exec_(self.mapToGlobal(event.pos()))
+        action = menu.exec(self.mapToGlobal(event.pos()))
         if action == delete_action:
             self.disable.emit()
             microbit_filename = menu_current_item.text()
@@ -789,7 +789,7 @@ class LocalFileList(MuFileList):
             )
         # Open outside Mu (things get meta if Mu is the default application)
         open_action = menu.addAction(_("Open"))
-        action = menu.exec_(self.mapToGlobal(event.pos()))
+        action = menu.exec(self.mapToGlobal(event.pos()))
         if action == open_action:
             # Get the file's path
             path = os.path.abspath(os.path.join(self.home, local_filename))
@@ -1152,7 +1152,7 @@ class PythonProcessPane(QTextEdit):
             paste_keys = QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_V)
         menu.addAction("Copy", self.copy, copy_keys)
         menu.addAction("Paste", self.paste, paste_keys)
-        menu.exec_(QCursor.pos())
+        menu.exec(QCursor.pos())
 
     def insertFromMimeData(self, source):
         """

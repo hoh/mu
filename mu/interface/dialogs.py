@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 import logging
-from PyQt5.QtCore import QSize, QProcess, QTimer, Qt
+from PyQt6.QtCore import QSize, QProcess, QTimer, Qt
 
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QHBoxLayout,
     QVBoxLayout,
     QGridLayout,
@@ -39,10 +39,11 @@ from PyQt5.QtWidgets import (
     QGroupBox,
     QComboBox,
 )
-from PyQt5.QtGui import QTextCursor
+from PyQt6.QtGui import QTextCursor
 from mu.resources import load_icon
 from mu.interface.widgets import DeviceSelector
 from ..virtual_environment import venv
+from .. import i18n
 
 logger = logging.getLogger(__name__)
 
@@ -497,11 +498,11 @@ class ESPFirmwareFlasherWidget(QWidget):
         self.process.readyReadStandardError.connect(self.read_process)
         self.process.readyReadStandardOutput.connect(self.read_process)
         self.process.finished.connect(self.esptool_finished)
-        self.process.error.connect(self.esptool_error)
+        self.process.errorOccurred.connect(self.esptool_error)
 
         command = self.commands.pop(0)
         self.log_text_area.appendPlainText(command + "\n")
-        self.process.start(command)
+        self.process.startCommand(command)
 
     def esptool_error(self, error_num):
         self.log_text_area.appendPlainText(

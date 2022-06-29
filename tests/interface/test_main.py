@@ -2,9 +2,9 @@
 """
 Tests for the user interface elements of Mu.
 """
-from PyQt5.QtWidgets import QAction, QWidget, QFileDialog, QMessageBox, QMenu
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox, QMenu
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QAction, QIcon, QKeySequence
 from unittest import mock
 import pytest
 from mu import __version__
@@ -801,14 +801,14 @@ def test_Window_on_context_menu_nothing_selected():
     menu = QMenu()
     menu.insertAction = mock.MagicMock()
     menu.insertSeparator = mock.MagicMock()
-    menu.exec_ = mock.MagicMock()
+    menu.exec = mock.MagicMock()
     mock_tab.createStandardContextMenu = mock.MagicMock(return_value=menu)
     w.on_context_menu()
     assert mock_tab.createStandardContextMenu.call_count == 1
     # No additional items added to the menu.
     assert menu.insertAction.call_count == 0
     assert menu.insertSeparator.call_count == 0
-    assert menu.exec_.call_count == 1
+    assert menu.exec.call_count == 1
 
 
 def test_Window_on_context_menu_has_selection_but_no_repl():
@@ -825,14 +825,14 @@ def test_Window_on_context_menu_has_selection_but_no_repl():
     menu = QMenu()
     menu.insertAction = mock.MagicMock()
     menu.insertSeparator = mock.MagicMock()
-    menu.exec_ = mock.MagicMock()
+    menu.exec = mock.MagicMock()
     mock_tab.createStandardContextMenu = mock.MagicMock(return_value=menu)
     w.on_context_menu()
     assert mock_tab.createStandardContextMenu.call_count == 1
     # No additional items added to the menu.
     assert menu.insertAction.call_count == 0
     assert menu.insertSeparator.call_count == 0
-    assert menu.exec_.call_count == 1
+    assert menu.exec.call_count == 1
 
 
 def test_Window_on_context_menu_has_selection_but_no_interactive_process():
@@ -850,14 +850,14 @@ def test_Window_on_context_menu_has_selection_but_no_interactive_process():
     menu = QMenu()
     menu.insertAction = mock.MagicMock()
     menu.insertSeparator = mock.MagicMock()
-    menu.exec_ = mock.MagicMock()
+    menu.exec = mock.MagicMock()
     mock_tab.createStandardContextMenu = mock.MagicMock(return_value=menu)
     w.on_context_menu()
     assert mock_tab.createStandardContextMenu.call_count == 1
     # No additional items added to the menu.
     assert menu.insertAction.call_count == 0
     assert menu.insertSeparator.call_count == 0
-    assert menu.exec_.call_count == 1
+    assert menu.exec.call_count == 1
 
 
 def test_Window_on_context_menu_with_repl():
@@ -874,14 +874,14 @@ def test_Window_on_context_menu_with_repl():
     menu = QMenu()
     menu.insertAction = mock.MagicMock()
     menu.insertSeparator = mock.MagicMock()
-    menu.exec_ = mock.MagicMock()
+    menu.exec = mock.MagicMock()
     menu.actions = mock.MagicMock(return_value=["foo"])
     mock_tab.createStandardContextMenu = mock.MagicMock(return_value=menu)
     w.on_context_menu()
     assert mock_tab.createStandardContextMenu.call_count == 1
     assert menu.insertAction.call_count == 1
     assert menu.insertSeparator.call_count == 1
-    assert menu.exec_.call_count == 1
+    assert menu.exec.call_count == 1
 
 
 def test_Window_on_context_menu_with_process_runner():
@@ -900,14 +900,14 @@ def test_Window_on_context_menu_with_process_runner():
     menu = QMenu()
     menu.insertAction = mock.MagicMock()
     menu.insertSeparator = mock.MagicMock()
-    menu.exec_ = mock.MagicMock()
+    menu.exec = mock.MagicMock()
     menu.actions = mock.MagicMock(return_value=["foo"])
     mock_tab.createStandardContextMenu = mock.MagicMock(return_value=menu)
     w.on_context_menu()
     assert mock_tab.createStandardContextMenu.call_count == 1
     assert menu.insertAction.call_count == 1
     assert menu.insertSeparator.call_count == 1
-    assert menu.exec_.call_count == 1
+    assert menu.exec.call_count == 1
 
 
 def test_Window_copy_to_repl_fragment():
@@ -1742,10 +1742,10 @@ def test_Window_update_title():
     w.setWindowTitle.assert_called_once_with("Mu - foo.py")
 
 
-def _qdesktopwidget_mock(width, height):
+def _qscreen_mock(width, height):
     """
-    Create and return a usable mock for QDesktopWidget that supports the
-    QDesktopWidget().screenGeometry() use case: it returns a mocked QRect
+    Create and return a usable mock for QScreen that supports the
+    screenGeometry() use case: it returns a mocked QRect
     responding to .width() and .height() per the passed in arguments.
     """
     mock_sg = mock.MagicMock()
@@ -1761,7 +1761,7 @@ def test_Window_autosize_window():
     Check the correct calculations take place and methods are called so the
     window is resized and positioned correctly.
     """
-    mock_qdw = _qdesktopwidget_mock(1024, 768)
+    mock_qdw = _qscreen_mock(1024, 768)
     w = mu.interface.main.Window()
     w.resize = mock.MagicMock(return_value=None)
     mock_size = mock.MagicMock()
@@ -1769,7 +1769,7 @@ def test_Window_autosize_window():
     mock_size.height = mock.MagicMock(return_value=614)
     w.geometry = mock.MagicMock(return_value=mock_size)
     w.move = mock.MagicMock(return_value=None)
-    with mock.patch("mu.interface.main.QDesktopWidget", mock_qdw):
+    with mock.patch("mu.interface.main.QWidget.screen", mock_qdw):
         w.size_window()
     mock_qdw.assert_called_once_with()
     w.resize.assert_called_once_with(int(1024 * 0.8), int(768 * 0.8))
@@ -1786,7 +1786,7 @@ def test_Window_autosize_window_off_screen():
     coordinates would put the window OFF the screen. See issue #1613 for
     context.
     """
-    mock_qdw = _qdesktopwidget_mock(1024, 768)
+    mock_qdw = _qscreen_mock(1024, 768)
     w = mu.interface.main.Window()
     w.resize = mock.MagicMock(return_value=None)
     mock_size = mock.MagicMock()
@@ -1870,7 +1870,7 @@ def test_Window_setup():
     mock_qtw_class = mock.MagicMock(return_value=mock_qtw)
     theme = "night"
     breakpoint_toggle = mock.MagicMock()
-    mock_qdw = _qdesktopwidget_mock(1000, 600)
+    mock_qdw = _qscreen_mock(1000, 600)
     with mock.patch(
         "mu.interface.main.QWidget", mock_widget_class
     ), mock.patch(
@@ -2316,7 +2316,7 @@ def test_Window_upload_to_python_anywhere():
         )
         mock_thread.start.assert_called_once_with()
         assert mock_worker.finished.connect.call_count == 3
-        assert mock_worker.error.connect.call_count == 3
+        assert mock_worker.errorOccurred.connect.call_count == 3
 
 
 def test_Window_handle_python_anywhere_complete():
