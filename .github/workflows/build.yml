@@ -87,3 +87,18 @@ jobs:
         with:
           name: mu-editor-${{ runner.os }}-${{ github.sha }}
           path: dist/Mu_Editor-AppImage-x86_64-${{ github.sha }}.tar
+
+  build-flatpak:
+    runs-on: ubuntu-latest
+    name: Build Flatpak
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Flatpak
+        run: |
+          apt-get update
+          apt-get install -y flatpak
+      - name: Build Flatpak image
+        working-directory: flatpak
+        run: |
+          flatpak-builder --user --install --force-clean build-dir mu.codewith.Editor.yml
+
